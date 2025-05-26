@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block title %}Успіх{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h2>🎉 Команду успішно збережено!</h2>
+    <a href="{% url 'parties_list' %}" class="btn btn-primary mt-3">назад до party</a>
+</div>
+{% endblock %}

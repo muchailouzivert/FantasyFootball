@@ -1,0 +1,216 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Профіль гравця: {{ player.name }}
+{% endblock %}
+
+{% block content %}
+<h1>Профіль гравця: {{ player.name }}</h1>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .player-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #007bff;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .player-photo img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid white;
+    }
+
+    .team-photo img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .player-info {
+        flex: 1;
+        margin-left: 20px;
+    }
+
+    .player-info h1 {
+        font-size: 2rem;
+        margin: 0;
+    }
+
+    .player-info p {
+        margin: 5px 0;
+        font-size: 1.2rem;
+    }
+
+    .player-stats-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .stats-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .stats-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .season-form {
+        display: flex;
+        align-items: center;
+    }
+
+    .season-form label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .season-form select {
+        padding: 5px;
+        font-size: 1rem;
+        margin-right: 10px;
+    }
+
+    .season-form button {
+        padding: 5px 10px;
+        font-size: 1rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .season-form button:hover {
+        background-color: #0056b3;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .stat-item {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    .stat-item h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+    .stat-item p {
+        margin: 10px 0 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .additional-info {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .additional-info h2 {
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    .additional-info p {
+        margin: 5px 0;
+        font-size: 1rem;
+        color: #555;
+    }
+</style>
+
+<div class="player-header">
+    <div class="player-photo">
+        <img src="/media/player.png" alt="Player Photo">
+    </div>
+    <div class="player-info">
+        <h1>{{ player.name }}</h1>
+        <p><strong>Клуб:</strong> {{ stats.team__team_name|default:"Невідомо" }}</p>
+        <p><strong>Позиція:</strong> {{ player.position|default:"Невідомо" }}</p>
+    </div>
+    {% if team_photo %}
+    <div class="team-photo">
+        <img src="{{ team_photo }}" alt="Team Logo">
+    </div>
+    {% endif %}
+</div>
+
+<div class="player-stats-container">
+    <div class="stats-header">
+        <h2>Статистика</h2>
+        <form method="get" class="season-form">
+            <label for="season_id">Виберіть сезон:</label>
+            <select id="season_id" name="season_id" required>
+                <option value="" disabled selected>-- Виберіть сезон --</option>
+                {% for season in seasons %}
+                <option value="{{ season.season_id }}" {% if stats and stats.season__season_name == season.season_name %}selected{% endif %}>
+                    {{ season.season_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Показати</button>
+        </form>
+    </div>
+
+    {% if stats %}
+    <div class="stats-grid">
+        <div class="stat-item">
+            <h3>Голи</h3>
+            <p>{{ stats.goals_scored|default:0 }}</p>
+        </div>
+        <div class="stat-item">
+            <h3>Асисти</h3>
+            <p>{{ stats.assists|default:0 }}</p>
+        </div>
+        <div class="stat-item">
+            <h3>Сейви</h3>
+            <p>{{ stats.saves|default:0 }}</p>
+        </div>
+        <div class="stat-item">
+            <h3>Загальні очки</h3>
+            <p>{{ stats.total_points|default:0 }}</p>
+        </div>
+    </div>
+    {% else %}
+    <p>Немає статистики для вибраного сезону.</p>
+    {% endif %}
+</div>
+
+<div class="additional-info">
+    <h2>Додаткова інформація</h2>
+    <p><strong>Кількість сезонів:</strong> {{ total_seasons }}</p>
+    <p><strong>Загальна кількість голів:</strong> {{ total_goals }}</p>
+    <p><strong>Загальна кількість асистів:</strong> {{ total_assists }}</p>
+</div>
+{% endblock %}

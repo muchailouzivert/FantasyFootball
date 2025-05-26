@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fantasy Football{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+
+    <!-- ✅ Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ✅ Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    {% block extra_head %}{% endblock %}
+
+</head>
+<body>
+    <header>
+        <nav class="nav">
+            <div class="logo-container">
+                <h1><a href="{% url 'home' %}" class="link">Fantasy Football</a></h1>
+            </div>
+            <ul class="list-items">
+                {% if user.is_authenticated %}
+                <li class="list">
+                    <form action="{% url 'top_100_players' %}" method="get" class="season-form">
+                        <select name="season_id" required>
+                            <option value="" disabled selected>-- Select a Season --</option>
+                            {% for season in seasons %}
+                            <option value="{{ season.season_id }}">{{ season.season_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">View Top 100</button>
+                    </form>
+                </li>
+                <li class="list">
+                    <button id="createPartyBtn" class="link" style="background:none;border:none;cursor:pointer;">Створити Party</button>
+                </li>
+                <li class="list">
+                    <a href="{% url 'parties_list' %}" class="link">Список Party</a>
+                </li>
+                <li class="list">
+                    <a href="{% url 'logout' %}" class="link">Logout</a>
+                </li>
+                {% else %}
+                <li class="list">
+                    <a href="{% url 'registration' %}" class="link">Register</a>
+                </li>
+                <li class="list">
+                    <a href="{% url 'login' %}" class="link">Login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 Fantasy Football. All rights reserved.</p>
+    </footer>
+
+    <!-- ✅ Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ✅ Створення Party -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('createPartyBtn');
+        if (btn) {
+            btn.addEventListener('click', function() {
+                const partyname = prompt("Введіть назву Party:", "Команда {{ user.username }}");
+                if (!partyname) return;
+                fetch("{% url 'create_party' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ partyname: partyname })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.party_id) {
+                        alert("Party створено! ID: " + data.party_id);
+                    } else {
+                        alert("Помилка: " + (data.error || "невідома"));
+                    }
+                })
+                .catch(() => alert("Помилка створення party"));
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block title %}Список Party{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Список створених Party та їх команд</h2>
+
+    {% if parties %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for party in parties %}
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold text-primary">{{ party.partyname }}</h5>
+                            <p class="card-text mb-1"><strong>Турнір:</strong> {{ party.tournament_obj.tournament_name }}</p>
+                            <p class="card-text mb-1"><strong>Дата створення:</strong> {{ party.tournament_obj.start_date|date:"Y.m.d" }}</p>
+                            <p class="card-text mb-1"><strong>Кількість учасників:</strong> {{ party.fantasyclub_set.count }}</p>
+                            <p class="card-text mb-3"><strong>Статус:</strong> 
+                                <span class="badge 
+                                    {% if party.get_status_display == 'Активна' %}bg-success
+                                    {% elif party.get_status_display == 'Завершена' %}bg-secondary
+                                    {% else %}bg-info{% endif %}">
+                                    {{ party.get_status_display }}
+                                </span>
+                            </p>
+
+                            {% with clubs=party.fantasyclub_set.all %}
+                                {% if clubs %}
+                                    <ul class="list-group list-group-flush mb-3">
+                                        {% for club in clubs %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>Команда:</strong>
+                                                    <a href="{% url 'club_detail' club.id %}" class="text-decoration-none">
+                                                        {{ club.clubname }}
+                                                    </a><br>
+                                                    <small>
+                                                        <strong>Користувач:</strong>
+                                                        <a href="{% url 'user_profile' club.user.id %}" class="text-decoration-none">
+                                                            {{ club.user.username }}
+                                                        </a>
+                                                    </small>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <div class="text-muted mb-3 fst-italic">Немає команд у цій party.</div>
+                                {% endif %}
+
+                                {% if user.is_authenticated and not party.user_has_club %}
+                                    <a href="{% url 'create_team' %}?party_id={{ party.id }}" class="btn btn-primary mt-auto align-self-start">
+                                        Створити команду
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-muted fst-italic">Жодної party ще не створено.</p>
+    {% endif %}
+</div>
+{% endblock %}

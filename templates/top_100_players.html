@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Home - Fantasy Football
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Top 100 Players of the Season {{ selected_season.season_name }}</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">
+                        <a class="text-white text-decoration-none" href="?season_id={{ selected_season.season_id }}&sort_by=player__name&order={% if sort_by == 'player__name' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Player
+                            {% if sort_by == 'player__name' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white text-decoration-none" href="?season_id={{ selected_season.season_id }}&sort_by=team__team_name&order={% if sort_by == 'team__team_name' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Team
+                            {% if sort_by == 'team__team_name' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white text-decoration-none" href="?season_id={{ selected_season.season_id }}&sort_by=goals_scored&order={% if sort_by == 'goals_scored' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Goals Scored
+                            {% if sort_by == 'goals_scored' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white text-decoration-none" href="?season_id={{ selected_season.season_id }}&sort_by=assists&order={% if sort_by == 'assists' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Assists
+                            {% if sort_by == 'assists' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white text-decoration-none" href="?season_id={{ selected_season.season_id }}&sort_by=saves&order={% if sort_by == 'saves' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Saves
+                            {% if sort_by == 'saves' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white text-decoration-none" href="?season_id={{ selected_season.season_id }}&sort_by=total_points&order={% if sort_by == 'total_points' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Total Points
+                            {% if sort_by == 'total_points' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in top_players %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><a href="{% url 'player_profile' player.player_id %}">{{ player.player__name }}</a></td>
+                    <td>{{ player.team__team_name }}</td>
+                    <td>{{ player.goals_scored }}</td>
+                    <td>{{ player.assists }}</td>
+                    <td>{{ player.saves }}</td>
+                    <td>{{ player.total_points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not top_players %}
+    <p class="text-center text-muted">No players found for the selected season.</p>
+    {% endif %}
+
+    <form action="{% url 'top_100_players' %}" method="get" class="d-flex justify-content-center align-items-center gap-3 mt-4 flex-wrap">
+        <label for="season_id" class="form-label mb-0 fw-semibold">Select Season:</label>
+        <select id="season_id" name="season_id" class="form-select w-auto" required>
+            <option value="" disabled selected>-- Select a Season --</option>
+            {% for season in seasons %}
+            <option value="{{ season.season_id }}">{{ season.season_name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">View Top 100 Players</button>
+    </form>
+</div>
+{% endblock %}

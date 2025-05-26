@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Best Player of the Season</title>
+</head>
+<body>
+    <h1>Best Player of the Season</h1>
+    {% if stats %}
+        <p><strong>Player:</strong> {{ stats.player__name }}</p>
+        <p><strong>Season:</strong> {{ stats.season__season_name }}</p>
+        <p><strong>Team:</strong> {{ stats.team__team_name }}</p>
+        <p><strong>Goals Scored:</strong> {{ stats.goals_scored }}</p>
+        <p><strong>Assists:</strong> {{ stats.assists }}</p>
+        <p><strong>Total Points:</strong> {{ stats.total_points }}</p>
+    {% else %}
+        <p>No stats found for the given season.</p>
+    {% endif %}
+</body>
+</html>

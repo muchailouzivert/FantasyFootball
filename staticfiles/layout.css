@@ -1,0 +1,49 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* header {
+    background-image: url("/static/src/noise.png");
+} */
+
+.nav {
+    top: 0;
+    position: fixed;
+    height: 8vh;
+    display: flex;
+    align-items: center;
+    /* background-image: url("/static/src/noise.png"); */
+    padding: 0 0px;
+    width: 100%;
+}
+
+.logo-container{
+    flex: 0.05;
+}
+.logo{
+    width: 50px;
+    margin: 10px;
+}
+
+.list-items{
+    display: flex;
+    flex: 0.4;
+    justify-content: space-between;
+    align-items: center;
+}
+.list {
+    list-style: none;
+}
+.link {
+    color: #7d8790;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link:hover {
+    color: #ff69b4;
+}
+
+

@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Результат Команди
+{% endblock %}
+
+{% block content %}
+<h1>Ваша Команда</h1>
+
+<h2>Воротар</h2>
+<p>{{ team.goalkeeper.name }}</p>
+
+<h2>Захисники</h2>
+<ul>
+    {% for player in team.defenders %}
+    <li>{{ player.name }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Півзахисники</h2>
+<ul>
+    {% for player in team.midfielders %}
+    <li>{{ player.name }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Нападники</h2>
+<ul>
+    {% for player in team.forwards %}
+    <li>{{ player.name }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

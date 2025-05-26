@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.hero-section {
+    min-height: 300px;
+    background: url('/static/media/lam.png') no-repeat center center/cover;
+    color: white;
+    padding: 50px 20px;
+}
+
+.player-card {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.player-photo {
+    border: 2px solid #007bff;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.team-photo {
+    border: 2px solid #28a745;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.news-item img {
+    border-radius: 5px;
+}
+
+.border-start {
+    border-left: 2px solid #ddd !important;
+}
+
+.table thead.table-light th {
+    background-color: #f4f4f9 !important;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}

@@ -1,0 +1,242 @@
+{% extends 'layout.html' %}
+
+{% block title %}Створення Команди{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/create_team.css' %}">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<h1 class="text-center my-4">Створіть свою футбольну команду (1-4-4-2)</h1>
+
+<div class="container football-field py-5">
+    <!-- Воротар -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-auto">
+            <button id="btn-goalkeepers-0" class="btn btn-primary position-btn"
+                onclick="showPlayers('goalkeepers', 0)">Воротар</button>
+        </div>
+    </div>
+
+    <!-- Захисники -->
+    <div class="row justify-content-center mb-4">
+        {% for i in "0123" %}
+        <div class="col-auto">
+            <button id="btn-defenders-{{ i }}" class="btn btn-success position-btn"
+                onclick="showPlayers('defenders', {{ i }})">Захисник {{ forloop.counter }}</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Півзахисники -->
+    <div class="row justify-content-center mb-4">
+        {% for i in "0123" %}
+        <div class="col-auto">
+            <button id="btn-midfielders-{{ i }}" class="btn btn-warning position-btn"
+                onclick="showPlayers('midfielders', {{ i }})">Півзахисник {{ forloop.counter }}</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Нападники -->
+    <div class="row justify-content-center">
+        {% for i in "01" %}
+        <div class="col-auto">
+            <button id="btn-forwards-{{ i }}" class="btn btn-danger position-btn"
+                onclick="showPlayers('forwards', {{ i }})">Нападник {{ forloop.counter }}</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<!-- Модалка -->
+<div class="modal fade" id="playerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Виберіть гравця</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+            </div>
+            <div class="modal-body" id="playerOptions" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savePlayerBtn" onclick="savePlayer()">Зберегти гравця</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="teamForm">
+    {% csrf_token %}
+    <div id="selectedPlayers" class="container my-4">
+        <h3>Вибрані гравці:</h3>
+        <ul id="playerList"></ul>
+    </div>
+    <button type="submit" class="btn btn-success w-100" id="saveTeamBtn" disabled>Зберегти команду</button>
+</form>
+
+{% if request.GET.party_id %}
+<script>
+    const partyId = "{{ request.GET.party_id }}";
+</script>
+{% else %}
+<script>
+    const partyId = "";
+</script>
+{% endif %}
+
+<script>
+    const players = {
+        goalkeepers: {{ goalkeepers|safe }},
+        defenders: {{ defenders|safe }},
+        midfielders: {{ midfielders|safe }},
+        forwards: {{ forwards|safe }}
+    };
+
+    const requiredCounts = {
+        goalkeepers: 1,
+        defenders: 4,
+        midfielders: 4,
+        forwards: 2
+    };
+
+    const selectedPlayers = {
+        goalkeepers: [],
+        defenders: [],
+        midfielders: [],
+        forwards: []
+    };
+
+    let currentPosition = '';
+    let currentIndex = 0;
+
+    function showPlayers(position, index) {
+        currentPosition = position;
+        currentIndex = index;
+
+        const modal = new bootstrap.Modal(document.getElementById('playerModal'));
+        const container = document.getElementById('playerOptions');
+        container.innerHTML = '';
+
+        const selectedIds = selectedPlayers[position]
+            .filter((p, i) => p && i !== index)
+            .map(p => p.id);
+
+        const availablePlayers = players[position].filter(player => !selectedIds.includes(player.id));
+
+        availablePlayers.forEach(player => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.width = '18rem';
+
+            card.innerHTML = `
+                <img src="${player.club_photo}" class="card-img-top" alt="Клуб">
+                <div class="card-body">
+                    <h5 class="card-title">${player.name}</h5>
+                    <p class="card-text">
+                        <strong>Позиція:</strong> ${player.position}<br>
+                        <strong>Клуб:</strong> ${player.club}<br>
+                        <strong>Очки:</strong> ${player.total_points}
+                    </p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="selectedPlayer" value="${player.id}" required>
+                        <label class="form-check-label">Обрати</label>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        modal.show();
+    }
+
+    function savePlayer() {
+        const selectedRadio = document.querySelector('input[name="selectedPlayer"]:checked');
+        if (!selectedRadio) {
+            alert('Будь ласка, оберіть гравця!');
+            return;
+        }
+
+        const playerId = selectedRadio.value;
+        const player = players[currentPosition].find(p => p.id == playerId);
+
+        const exists = selectedPlayers[currentPosition].some(p => p && p.id == player.id);
+        if (exists) {
+            alert('Цього гравця вже обрано на цю позицію!');
+            return;
+        }
+
+        selectedPlayers[currentPosition][currentIndex] = player;
+
+        const btnId = `btn-${currentPosition}-${currentIndex}`;
+        document.getElementById(btnId).textContent = player.name;
+
+        updateSelectedPlayers();
+        bootstrap.Modal.getInstance(document.getElementById('playerModal')).hide();
+
+        const excludeIds = selectedPlayers[currentPosition]
+            .filter(p => p)
+            .map(p => p.id);
+
+        fetch(`/get-random-players/?position=${currentPosition}&exclude=${JSON.stringify(excludeIds)}`)
+            .then(res => res.json())
+            .then(data => {
+                players[currentPosition] = data;
+            });
+    }
+    
+    function updateSelectedPlayers() {
+        const playerList = document.getElementById('playerList');
+        playerList.innerHTML = '';
+
+        Object.entries(selectedPlayers).forEach(([position, list]) => {
+            list.forEach(player => {
+                if (player) {
+                    const li = document.createElement('li');
+                    li.textContent = `${player.name} (${player.position})`;
+                    playerList.appendChild(li);
+                }
+            });
+        });
+
+        const isComplete = Object.entries(requiredCounts).every(
+            ([pos, count]) => selectedPlayers[pos].length === count && selectedPlayers[pos].every(p => p)
+        );
+        document.getElementById('saveTeamBtn').disabled = !isComplete;
+    }
+    
+    document.getElementById('teamForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const data = {
+            goalkeeper: selectedPlayers.goalkeepers[0]?.id,
+            defenders: selectedPlayers.defenders.map(p => p.id),
+            midfielders: selectedPlayers.midfielders.map(p => p.id),
+            forwards: selectedPlayers.forwards.map(p => p.id),
+            party_id: partyId 
+        };
+
+        fetch("{% url 'submit_team' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            window.location.href = "{% url 'team_success' %}";
+        })
+        .catch(error => {
+            alert("Помилка: " + error.message);
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

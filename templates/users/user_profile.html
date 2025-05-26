@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block title %}Профіль користувача {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<h2>Профіль користувача: {{ profile_user.username }}</h2>
+<ul class="list-group mb-3">
+    <li class="list-group-item"><strong>Нік:</strong> {{ profile_user.username }}</li>
+</ul>
+<h4>Party, в яких є команда:</h4>
+<ul class="list-group">
+    {% for club in clubs %}
+        <li class="list-group-item">
+            {{ club.party.partyname }} —
+            <a href="{% url 'club_detail' club.id %}">Перейти до команди "{{ club.clubname }}"</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item text-muted">Немає команд у жодній party.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'parties_list' %}" class="btn btn-secondary mt-3">Назад до списку Party</a>
+{% endblock %}

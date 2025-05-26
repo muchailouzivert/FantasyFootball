@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Players with Stats</title>
+</head>
+<body>
+    <h1>All Players with Stats</h1>
+    <table border="1">
+        <tr>
+            <th>Player ID</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Season</th>
+            <th>Team</th>
+            <th>Goals Scored</th>
+            <th>Assists</th>
+            <th>Total Points</th>
+        </tr>
+        {% for player in players %}
+        <tr>
+            <td>{{ player.player_id }}</td>
+            <td>{{ player.name }}</td>
+            <td>{{ player.position }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

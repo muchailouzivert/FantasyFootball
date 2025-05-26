@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Fantasy Football - Home
+{% endblock %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+{% block content %}
+<div class="hero-section text-center text-white py-5" style="background: url('{% static 'media/lam.png' %}') no-repeat center center/cover; min-height: 300px;">
+    <h1 class="display-4">Welcome to Fantasy Football</h1>
+    <p class="lead">Track your favorite players, teams, and leagues!</p>
+</div>
+
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-lg-8">
+            {% if random_season and best_player %}
+            <div class="card mb-4 shadow-sm player-card">
+                <div class="card-body d-flex align-items-center">
+                    <img src="/media/player.png" alt="Player" class="player-photo rounded-circle me-3" width="80" height="80">
+                    {% if best_player_team_photo %}
+                    <img src="{{ best_player_team_photo }}" alt="Team" class="team-photo rounded-circle me-3" width="80" height="80">
+                    {% endif %}
+                    <div>
+                        <h5 class="card-title mb-1">Player of the Season: {{ random_season.season_name }}</h5>
+                        <p class="mb-0"><strong>Player:</strong> <a href="{% url 'player_profile' best_player.player_id %}">{{ best_player.player__name }}</a></p>
+                        <p class="mb-0"><strong>Team:</strong> {{ best_player.team__team_name }}</p>
+                        <p class="mb-0"><strong>Goals Scored:</strong> {{ best_player.goals_scored }}</p>
+                        <p class="mb-0"><strong>Assists:</strong> {{ best_player.assists }}</p>
+                        <p class="mb-0"><strong>Total Points:</strong> {{ best_player.total_points }}</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p>No data available for a random season.</p>
+            {% endif %}
+
+            <div class="news-section">
+                <h2 class="mb-3">Latest News</h2>
+                <div class="d-flex mb-3 news-item">
+                    <img src="/static/media/news.jpg" alt="News 1" class="me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                    <div>
+                        <h5>Exciting Match Results</h5>
+                        <p>Check out the latest results from the Premier League.</p>
+                    </div>
+                </div>
+                <div class="d-flex mb-3 news-item">
+                    <img src="/static/media/news.jpg" alt="News 2" class="me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                    <div>
+                        <h5>Top Players of the Week</h5>
+                        <p>Discover who performed the best this week.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 border-start ps-4">
+            {% for league, players in top_players_by_league.items %}
+            <h3 class="mb-3">Найкращі гравці Ліги {{ league }}</h3>
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Гравець</th>
+                        <th>Команда</th>
+                        <th>Очки</th>
+                        <th>Посилання</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr>
+                        <td>{{ player.player__name }}</td>
+                        <td>{{ player.team__team_name }}</td>
+                        <td>{{ player.total_points }}</td>
+                        <td><a href="{% url 'player_profile' player.player_id %}">Переглянути</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
