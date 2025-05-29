@@ -66,17 +66,9 @@ def get_strength(club_id, season_id=3):
         return sum(row[0] or 0 for row in cursor.fetchall())
 
 def simulate_fantasy_match(club1, club2, n_attempts=90, scale=0.5, tour=1):
-    """
-    Симуляція матчу між двома FantasyClub.
-    club1, club2 — об'єкти FantasyClub.
-    Повертає: (goals_club1, goals_club2, result_obj)
-    """
-
-    # --- Перевірка: команда не може грати сама з собою ---
     if club1.id == club2.id:
         raise ValueError("Команда не може грати сама з собою!")
 
-    # --- Перевірка: обидві команди мають бути з однієї party ---
     if club1.party_id != club2.party_id:
         raise ValueError("Обидві команди мають бути з однієї party!")
 

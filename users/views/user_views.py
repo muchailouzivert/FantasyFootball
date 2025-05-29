@@ -10,23 +10,19 @@ from django.http import HttpResponseBadRequest
 
 
 def home(request):
-    # Отримати всі сезони
     seasons = Season.objects.all()
 
-    # Отримати публічні ліги (приклад: всі команди)
     leagues = Team.objects.all()
 
-    # Отримати топ-10 гравців для кожної ліги
     top_players_by_league = {}
     for league in leagues:
         top_players = Player_Season_Stats.objects.filter(
-            team__league=league.league  # Фільтруємо за назвою ліги
+            team__league=league.league  
         ).order_by('-total_points').values(
             'player_id', 'player__name', 'team__team_name', 'total_points'
         )[:10]
         top_players_by_league[league.league] = top_players
 
-    # Випадковий сезон і найкращий гравець
     random_season = seasons.order_by('?').first()
     best_player = None
     best_player_team_photo = None

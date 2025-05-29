@@ -1,12 +1,10 @@
 from django.contrib import admin
 from .models import (
     Player, Team, Season, Player_Season_Stats,
-    Tournament, Party, FantasyClub, FantasyClubFootballer
-)
+    Tournament, Party, FantasyClub, FantasyClubFootballer)
 from django.db.models import OuterRef, Subquery, IntegerField
 from django.contrib import messages
 from users.services import simulate_fantasy_match
-
 
 @admin.register(Player)
 class PlayerAdmin(admin.ModelAdmin):
@@ -83,4 +81,3 @@ class FantasyClubAdmin(admin.ModelAdmin):
 class FantasyClubFootballerAdmin(admin.ModelAdmin):
     list_display = ('fantasy_club', 'footballer')
     search_fields = ('fantasy_club__clubname', 'footballer__name')
-
